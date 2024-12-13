@@ -10,7 +10,9 @@ export const findAiSkillsDirectory = getInjectable({
     type: "function",
 
     function: {
-      function: (input) => path.join("src", "skills"),
+      name: "find-ai-skills-directory",
+      parser: JSON.parse,
+      function: () => path.join("src", "skills"),
       description: "Returns the directory where AI skills are stored.",
 
       parameters: {

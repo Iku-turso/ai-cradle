@@ -9,7 +9,7 @@ export const npmInstallOnSaveSkill = getInjectable({
     type: "function",
 
     function: {
-      name: "monitor-and-run-npm-install",
+      name: "determine-if-npm-install-is-required",
       parse: JSON.parse,
       function: () => "Yes",
 

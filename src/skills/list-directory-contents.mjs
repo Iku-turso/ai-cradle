@@ -10,6 +10,8 @@ export const listDirectoryContents = getInjectable({
     type: "function",
 
     function: {
+      name: "list-directory-contents",
+      parse: JSON.parse,
       function: async (input) => {
         const directoryPath = input.directoryPath;
 
@@ -17,7 +19,7 @@ export const listDirectoryContents = getInjectable({
           const files = await fs.readdir(directoryPath);
           return files;
         } catch (err) {
-          throw err;
+          return err;
         }
       },
       description: "Lists the contents of a specified directory",

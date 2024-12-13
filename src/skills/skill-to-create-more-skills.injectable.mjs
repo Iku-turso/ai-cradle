@@ -11,10 +11,8 @@ export const skillToCreateMoreSkillsInjectable = getInjectable({
 
     function: {
       name: "get-ai-skill-template",
-
       description:
         "Returns a javascript (.mjs) template for source-code of a new AI-skill. It needs to be specialized with context specific changes, and the comments need to be removed.",
-
       parse: JSON.parse,
 
       function: async () => `

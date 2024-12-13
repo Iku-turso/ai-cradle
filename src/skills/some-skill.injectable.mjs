@@ -10,9 +10,9 @@ export const someSkillInjectable = getInjectable({
 
     function: {
       name: "reveal-big-secret",
+      description: "This is the big secret",
       parse: JSON.parse,
       function: () => "Spanish babies are cute",
-      description: "This is the big secret",
       parameters: { type: "object", properties: {} },
     },
   }),
