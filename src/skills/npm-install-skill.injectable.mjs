@@ -1,5 +1,7 @@
 import injectable from "@ogre-tools/injectable";
 import { skillInjectionToken } from "../engine/skill-injection-token.mjs";
+import { exec } from "child_process";
+
 const { getInjectable } = injectable;
 
 export const npmInstallSkill = getInjectable({
@@ -12,11 +14,9 @@ export const npmInstallSkill = getInjectable({
       name: "run-npm-install",
       parse: JSON.parse,
       function: (input) => {
-        // Logic to run `npm install` in the specified directory.
-        const exec = require('child_process').exec;
         const directory = input.directory || process.cwd();
 
-        exec('npm install', { cwd: directory }, (err, stdout, stderr) => {
+        exec("npm install", { cwd: directory }, (err, stdout, stderr) => {
           if (err) {
             return { success: false, error: stderr };
           }
@@ -30,8 +30,8 @@ export const npmInstallSkill = getInjectable({
           directory: {
             type: "string",
             description: "The directory where npm install should be run.",
-            default: process.cwd()
-          }
+            default: process.cwd(),
+          },
         },
         required: [],
       },

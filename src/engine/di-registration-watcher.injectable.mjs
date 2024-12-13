@@ -25,7 +25,6 @@ export const diRegistrationWatcherInjectable = getInjectable({
         const directoryToWatch = path.resolve("src", "skills");
 
         const watcher = chokidar.watch(directoryToWatch, {
-          // ignored: /^(?!.*\.injectable\.mjs$)/,
           persistent: true,
           depth: 99,
           ignoreInitial: false,
@@ -45,6 +44,10 @@ export const diRegistrationWatcherInjectable = getInjectable({
 });
 
 const registerFor = (di, injectablesByPath) => async (filePath) => {
+  if (!filePath.endsWith(".injectable.mjs")) {
+    return;
+  }
+
   try {
     await pipeline(
       await import(`${filePath}?${Math.random()}`),
@@ -66,6 +69,10 @@ const registerFor = (di, injectablesByPath) => async (filePath) => {
 };
 
 const deregisterFor = (di, injectablesByPath) => (filePath) => {
+  if (!filePath.endsWith(".injectable.mjs")) {
+    return;
+  }
+
   pipeline(injectablesByPath.get(filePath), (injectables) => {
     if (injectables) {
       di.deregister(...injectables);
