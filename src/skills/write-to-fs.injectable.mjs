@@ -14,7 +14,7 @@ export const writeToFs = getInjectable({
     function: {
       name: "write-to-fs",
       description:
-        "Write a file to a deducted filename (in kebab-case). If it's a .js-file, use .mjs instead.",
+        "Write a file to a deducted filename (in kebab-case). If it's a .js-file, use .mjs instead. If it's an AI-skill, write it to /src/skills.",
 
       parse: JSON.parse,
 
