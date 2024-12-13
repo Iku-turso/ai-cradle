@@ -1,6 +1,9 @@
 import injectable from "@ogre-tools/injectable";
+import dotenv from "dotenv";
 
 import { diRegistrationWatcherInjectable } from "./src/engine/di-registration-watcher.injectable.mjs";
+
+dotenv.config();
 
 const { createContainer } = injectable;
 

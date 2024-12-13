@@ -5,7 +5,7 @@
   "scripts": {
     "setup": "npm install",
     "run": "node index.mjs",
-    "run:watch": "nodemon index.mjs"
+    "run:watch": "nodemon --exec \"clear && node\" index.mjs"
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +19,7 @@
     "openai": "^4.76.2"
   },
   "devDependencies": {
+    "dotenv": "^16.4.7",
     "jest": "^29.7.0",
     "nodemon": "^3.1.7",
     "prettier": "^3.4.2"
