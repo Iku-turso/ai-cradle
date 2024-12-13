@@ -67,7 +67,9 @@ const registerFor = (di, injectablesByPath) => async (filePath) => {
 
 const deregisterFor = (di, injectablesByPath) => (filePath) => {
   pipeline(injectablesByPath.get(filePath), (injectables) => {
-    di.deregister(...injectables);
+    if (injectables) {
+      di.deregister(...injectables);
+    }
 
     delete require.cache[require.resolve(filePath)];
 
