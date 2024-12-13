@@ -1,5 +1,5 @@
 import injectable from "@ogre-tools/injectable";
-import { skillInjectionToken } from "../engine/skillInjectionToken.mjs";
+import { skillInjectionToken } from "../engine/skill-injection-token.mjs";
 const { getInjectable } = injectable;
 
 export const someSkillInjectable = getInjectable({

@@ -3,7 +3,7 @@ import { createRequire } from "module";
 import OpenAI from "openai";
 import { terminalInterfaceInjectable } from "./terminal-interface.injectable.mjs";
 import { promptInputFromUserInjectable } from "./prompt-input-from-user.injectable.mjs";
-import { skillInjectionToken } from "./skillInjectionToken.mjs";
+import { skillInjectionToken } from "./skill-injection-token.mjs";
 
 const require = createRequire(import.meta.url);
 
