@@ -46,14 +46,23 @@ export const sendMessageInjectable = getInjectable({
 
       messages.push(userMessage);
 
-      const tools = di.injectMany(skillInjectionToken);
+      const skills = di.injectMany(skillInjectionToken);
+
+      const skillsWithErrorHandling = skills.map((skill) => ({
+        ...skill,
+
+        function: {
+          ...skill.function,
+          function: withTryForResult(skill.function.function),
+        },
+      }));
 
       const runner = openai.beta.chat.completions
         .runTools({
           // stream: true,
           model: "gpt-4o",
           messages,
-          ...(tools.length > 0 ? { tools } : {}),
+          ...(skills.length > 0 ? { tools: skillsWithErrorHandling } : {}),
         })
         //   .on("content", (delta, snapshot) => {
         //     console.log(snapshot);
@@ -78,3 +87,36 @@ export const sendMessageInjectable = getInjectable({
     getInstanceKey: (conversationId) => conversationId,
   }),
 });
+
+const result = {
+  ok: (value) => ({ ok: true, value }),
+  error: (error) => ({ ok: false, error }),
+};
+
+const isFunction = (val) => typeof val === "function";
+
+const isObject = (val) => typeof val === "object" && val !== null;
+
+const isPromiseLike = (res) => {
+  if (res instanceof Promise) {
+    return true;
+  }
+
+  return isObject(res) && hasTypedProperty(res, "then", isFunction);
+};
+
+export const withTryForResult =
+  (toBeDecorated) =>
+  (...args) => {
+    try {
+      const maybePromise = toBeDecorated(...args);
+
+      if (isPromiseLike(maybePromise)) {
+        return maybePromise.then(result.ok).catch(result.error);
+      }
+
+      return result.ok(maybePromise);
+    } catch (e) {
+      return result.error(e);
+    }
+  };

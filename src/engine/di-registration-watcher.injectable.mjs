@@ -78,8 +78,6 @@ const deregisterFor = (di, injectablesByPath) => (filePath) => {
       di.deregister(...injectables);
     }
 
-    delete require.cache[require.resolve(filePath)];
-
     // console.log(
     //   "Skills deregistered:",
     //   injectables.map((x) => `"${x.id}"`).join(", "),
