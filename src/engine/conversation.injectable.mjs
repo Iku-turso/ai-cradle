@@ -112,19 +112,20 @@ export const withTryForResult =
   (toBeDecorated, skillName) =>
   (...args) => {
     try {
-      console.error("Running skill", skillName, args[0], args[1].messages);
+      console.log(`Skill(${skillName}):`, args[0]);
+
       const maybePromise = toBeDecorated(...args);
 
       if (isPromiseLike(maybePromise)) {
         return maybePromise.then(result.ok).catch((e) => {
-          // console.error("Tried to run skill, but error happened", e);
+          console.error(`Skill(${skillName}):`, "error", e);
           return result.error(e);
         });
       }
 
       return result.ok(maybePromise);
     } catch (e) {
-      // console.error("Tried to run skill, but error happened", e);
+      console.error(`Skill(${skillName}):`, "error", e);
       return result.error(e);
     }
   };
