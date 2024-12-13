@@ -3,7 +3,6 @@ import chokidar from "chokidar";
 import injectable from "@ogre-tools/injectable";
 import ogreToolsFp from "@ogre-tools/fp";
 import { createRequire } from "module";
-import fs from "fs";
 
 const require = createRequire(import.meta.url);
 const lodashFp = require("lodash/fp");
@@ -45,31 +44,35 @@ export const diRegistrationWatcherInjectable = getInjectable({
   },
 });
 
-const registerFor = (di, injectablesByPath) => async (filePath) => {
-  await pipeline(
-    await import(filePath),
-    values,
-    filter(isInjectable),
-    (injectables) => {
-      di.register(...injectables);
-      injectablesByPath.set(filePath, injectables);
+const registerFor = (di, injectablesByPath) => {
+  return async (filePath) => {
+    pipeline(
+      await import(`${filePath}?${Math.random()}`),
+      values,
+      filter(isInjectable),
+      (injectables) => {
+        di.register(...injectables);
+        injectablesByPath.set(filePath, injectables);
 
-      console.log(
-        "Skills registered:",
-        injectables.map((x) => `"${x.id}"`).join(", "),
-      );
-    },
-  );
+        // console.log(
+        //   "Skills registered:",
+        //   injectables.map((x) => `"${x.id}"`).join(", "),
+        // );
+      },
+    );
+  };
 };
 
 const deregisterFor = (di, injectablesByPath) => (filePath) => {
   pipeline(injectablesByPath.get(filePath), (injectables) => {
     di.deregister(...injectables);
 
-    console.log(
-      "Skills deregistered:",
-      injectables.map((x) => `"${x.id}"`).join(", "),
-    );
+    delete require.cache[require.resolve(filePath)];
+
+    // console.log(
+    //   "Skills deregistered:",
+    //   injectables.map((x) => `"${x.id}"`).join(", "),
+    // );
   });
 
   injectablesByPath.delete(filePath);

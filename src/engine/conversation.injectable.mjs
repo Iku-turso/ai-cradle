@@ -1,22 +1,19 @@
 import injectable from "@ogre-tools/injectable";
-import ogreToolsFp from "@ogre-tools/fp";
 import { createRequire } from "module";
 import OpenAI from "openai";
 import { terminalInterfaceInjectable } from "./terminal-interface.injectable.mjs";
 import { promptInputFromUserInjectable } from "./prompt-input-from-user.injectable.mjs";
+import { skillInjectionToken } from "./skillInjectionToken.mjs";
 
 const require = createRequire(import.meta.url);
-const lodashFp = require("lodash/fp");
 
-const { pipeline } = ogreToolsFp;
-const { values, filter, spread } = lodashFp;
-const { getInjectable, isInjectable } = injectable;
+const { getInjectable } = injectable;
 
 export const conversationInjectable = getInjectable({
   id: "conversation",
 
   instantiate: (di) => {
-    const messageThread = [];
+    const messages = [];
 
     const openai = new OpenAI({
       apiKey: process.env.OPEN_AI_API_KEY,
@@ -28,26 +25,16 @@ export const conversationInjectable = getInjectable({
     const sendMessage = async (message) => {
       const userMessage = { role: "user", content: message };
 
-      messageThread.push(userMessage);
+      messages.push(userMessage);
+
+      const tools = di.injectMany(skillInjectionToken);
 
       const runner = openai.beta.chat.completions
         .runTools({
           // stream: true,
           model: "gpt-4o",
-          messages: messageThread,
-
-          tools: [
-            {
-              type: "function",
-              function: {
-                function: () => {
-                  return "42";
-                },
-                description: "Get the meaning of life",
-                parameters: { type: "object", properties: {} },
-              },
-            },
-          ],
+          messages,
+          ...(tools.length > 0 ? { tools } : {}),
         })
         //   .on("content", (delta, snapshot) => {
         //     console.log(snapshot);
@@ -57,7 +44,7 @@ export const conversationInjectable = getInjectable({
             delete message.tool_calls;
           }
 
-          messageThread.push(message);
+          messages.push(message);
         });
 
       return await runner.finalContent();
@@ -67,7 +54,6 @@ export const conversationInjectable = getInjectable({
       start: async () => {
         while (true) {
           const userInput = await promptInputFromUser();
-          // terminalInterface.write(`User: ${userInput}\n`);
 
           const response = await sendMessage(userInput);
 
@@ -75,16 +61,5 @@ export const conversationInjectable = getInjectable({
         }
       },
     };
-
-    // return {
-    //   sendMessage: ,
-    //
-    //   get messageThread() {
-    //     return messageThread
-    //       .filter((message) => message.role !== "tool")
-    //       .filter((message) => message.tool_calls === undefined)
-    //       .map((message) => message.content);
-    //   },
-    // };
   },
 });
