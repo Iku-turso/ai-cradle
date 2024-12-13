@@ -13,6 +13,8 @@ const { values, filter, spread } = lodashFp;
 const { getInjectable, isInjectable } = injectable;
 
 export const diRegistrationWatcherInjectable = getInjectable({
+  id: "di-registration-watcher",
+
   instantiate: (di) => {
     const injectablesByPath = new Map();
     const register = registerFor(di, injectablesByPath);
@@ -41,8 +43,6 @@ export const diRegistrationWatcherInjectable = getInjectable({
       },
     };
   },
-
-  id: "di-registration-watcher",
 });
 
 const registerFor = (di, injectablesByPath) => async (filePath) => {
