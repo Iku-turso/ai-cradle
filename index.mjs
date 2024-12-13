@@ -34,5 +34,3 @@ const { start: startConversation } = di.inject(
 
 startAutoRegistration();
 await startConversation();
-
-setInterval(() => {}, 1000);
