@@ -53,7 +53,10 @@ export const sendMessageInjectable = getInjectable({
 
         function: {
           ...skill.function,
-          function: withTryForResult(skill.function.function),
+          function: withTryForResult(
+            skill.function.function,
+            skill.function.name,
+          ),
         },
       }));
 
@@ -106,17 +109,22 @@ const isPromiseLike = (res) => {
 };
 
 export const withTryForResult =
-  (toBeDecorated) =>
+  (toBeDecorated, skillName) =>
   (...args) => {
     try {
+      console.error("Running skill", skillName, args[0], args[1].messages);
       const maybePromise = toBeDecorated(...args);
 
       if (isPromiseLike(maybePromise)) {
-        return maybePromise.then(result.ok).catch(result.error);
+        return maybePromise.then(result.ok).catch((e) => {
+          // console.error("Tried to run skill, but error happened", e);
+          return result.error(e);
+        });
       }
 
       return result.ok(maybePromise);
     } catch (e) {
+      // console.error("Tried to run skill, but error happened", e);
       return result.error(e);
     }
   };
