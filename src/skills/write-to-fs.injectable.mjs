@@ -19,10 +19,7 @@ export const writeToFs = getInjectable({
       parse: JSON.parse,
 
       function: (input) => {
-        fs.writeFileSync(
-          path.join("src", "skills", input.fileName),
-          input.fileContent.toString(),
-        );
+        fs.writeFileSync(input.fileName, input.fileContent.toString());
       },
 
       parameters: {
