@@ -13,24 +13,25 @@ export const writeToFs = getInjectable({
       type: "function",
 
       function: {
-        function: async (input) => {
-          const parsedInput = JSON.parse(input);
-          console.log(123123, parsedInput);
+        name: "write-to-fs",
 
+        parse: JSON.parse,
+
+        function: async (input) => {
           fs.writeFileSync(
-            path.join("example.txt"),
-            parsedInput.fileContent.toString(),
+            path.join(input.fileName),
+            input.fileContent.toString(),
           );
         },
 
-        description: "Write a file to file-system",
+        description: "Write a file to a deducted filename",
 
         parameters: {
           type: "object",
 
           properties: {
             fileContent: { type: "string" },
-            // fileName: { type: "string" },
+            fileName: { type: "string" },
           },
         },
       },

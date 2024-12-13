@@ -1,9 +1,10 @@
 import injectable from "@ogre-tools/injectable";
 import { skillInjectionToken } from "../engine/skillInjectionToken.mjs";
 import { sendMessageInjectable2 } from "../engine/conversation.injectable.mjs";
+import { z } from "zod";
 const { getInjectable } = injectable;
 
-const skillToCreateMoreSkillsInjectable = getInjectable({
+export const skillToCreateMoreSkillsInjectable = getInjectable({
   id: "skill-to-create-more-skills",
 
   instantiate: (di) => {
@@ -16,13 +17,13 @@ const skillToCreateMoreSkillsInjectable = getInjectable({
       type: "function",
 
       function: {
-        function: async (input) => {
-          console.log(222222222222);
-          const parsedInput = JSON.parse(input);
+        name: "create-an-ai-skill",
+        parse: JSON.parse,
 
+        function: async (input) => {
           const message =
-            'Give me javascript-sourcecode for "' +
-            parsedInput.skillDescription +
+            'Give me javascript-source-code for "' +
+            input.skillDescription +
             '". Use this template of what that could look like: \n' +
             `
 import injectable from "@ogre-tools/injectable";

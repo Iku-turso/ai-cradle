@@ -94,8 +94,6 @@ export const sendMessageInjectable2 = getInjectable({
 
       messages.push(userMessage);
 
-      console.log({ userMessage });
-
       const runner = openai.beta.chat.completions
         .runTools({
           // stream: true,

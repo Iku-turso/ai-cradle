@@ -4,20 +4,16 @@ import fs from "fs";
 
 const { getInjectable } = injectable;
 
-const readFromFs = getInjectable({
+export const readFromFs = getInjectable({
   id: "read-from-fs",
 
   instantiate: (di) => {
     return {
       type: "function",
-
       function: {
-        function: async (input) => {
-          const parsedInput = JSON.parse(input);
-
-          return fs.readFileSync(parsedInput.filePath, "utf8");
-        },
-
+        name: "read-from-fs",
+        parse: JSON.parse,
+        function: async (input) => fs.readFileSync(input.filePath, "utf8"),
         description: "Read a file from file-system",
 
         parameters: {
