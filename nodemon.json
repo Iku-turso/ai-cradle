@@ -1,0 +1,5 @@
+{
+  "watch": ["index.mjs", "src/engine", "node_modules"],
+  "ignore": ["*.test.mjs"],
+  "ext": "mjs,json"
+}
