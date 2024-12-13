@@ -44,9 +44,9 @@ export const diRegistrationWatcherInjectable = getInjectable({
   },
 });
 
-const registerFor = (di, injectablesByPath) => {
-  return async (filePath) => {
-    pipeline(
+const registerFor = (di, injectablesByPath) => async (filePath) => {
+  try {
+    await pipeline(
       await import(`${filePath}?${Math.random()}`),
       values,
       filter(isInjectable),
@@ -60,7 +60,9 @@ const registerFor = (di, injectablesByPath) => {
         // );
       },
     );
-  };
+  } catch (e) {
+    console.error("error while registering", e);
+  }
 };
 
 const deregisterFor = (di, injectablesByPath) => (filePath) => {
