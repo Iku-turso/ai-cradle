@@ -45,7 +45,7 @@ export const sendMessageInjectable = getInjectable({
       const runner = openai.beta.chat.completions
         .runTools({
           // stream: true,
-          model: "gpt-4o",
+          model: process.env.OPEN_AI_MODEL,
           messages: [directivesMessage, ...userMessages],
 
           ...(skillsWithErrorHandling.length > 0
