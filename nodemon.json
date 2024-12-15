@@ -1,5 +1,6 @@
 {
   "watch": ["index.mjs", "package.json", "src/engine", ".env", ".env.example", "node_modules"],
   "ignore": ["*.test.mjs"],
+  "quiet": true,
   "ext": "mjs,json"
 }
