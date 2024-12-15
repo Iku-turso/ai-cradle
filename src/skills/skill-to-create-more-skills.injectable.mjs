@@ -12,7 +12,7 @@ export const skillToCreateMoreSkillsInjectable = getInjectable({
     function: {
       name: "get-ai-skill-template",
       description:
-        "Returns a javascript (.mjs) template for source-code of a new AI-skill. It needs to be specialized with context specific changes, and the comments need to be removed. Use import over require, as the result should be ECMAScript Module (ESM) syntax. The filename of skill should have extension '.injectable.mjs', and it should be written in /src/skills/*.injectable.mjs.",
+        "Returns a javascript (.mjs) template for source-code of a new AI-skill. It needs to be specialized with context specific changes, and the comments need to be removed. Use import over require, as the result should be ECMAScript Module (ESM) syntax.",
       parse: JSON.parse,
 
       function: async () => `

@@ -1,25 +1,25 @@
+import OpenAI from "openai";
 import injectable from "@ogre-tools/injectable";
 const { getInjectable, lifecycleEnum } = injectable;
 import { skillInjectionToken } from "./skill-injection-token.mjs";
-import OpenAI from "openai";
+import { aiDirectiveInjectionToken } from "./ai-directive-injection-token.mjs";
 
 export const sendMessageInjectable = getInjectable({
   id: "send-message",
 
   instantiate: (di) => {
-    const messages = [];
+    const directives = di
+      .injectMany(aiDirectiveInjectionToken)
+      .map(toUserMessage);
+
+    const messages = [...directives];
 
     const openai = new OpenAI({
       apiKey: process.env.OPEN_AI_API_KEY,
     });
 
     return async (message) => {
-      const userMessage = {
-        role: "user",
-        content: message,
-      };
-
-      messages.push(userMessage);
+      messages.push(toUserMessage(message));
 
       const skills = di.injectMany(skillInjectionToken);
 
@@ -104,3 +104,8 @@ export const withTryForResult =
       return result.error(e);
     }
   };
+
+const toUserMessage = (message) => ({
+  role: "user",
+  content: message,
+});

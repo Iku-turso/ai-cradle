@@ -12,8 +12,15 @@ const { pipeline } = ogreToolsFp;
 const { values, filter, spread } = lodashFp;
 const { getInjectable, isInjectable } = injectable;
 
-const withFileUrl = (toBeDecorated) => (filePath) =>
-  toBeDecorated(pathToFileURL(filePath).href);
+const withFileUrl = (toBeDecorated) => (filePath) => {
+  const filePathIsFileUrlAlready = filePath.startsWith("file://");
+
+  if (filePathIsFileUrlAlready) {
+    return toBeDecorated(filePath);
+  }
+
+  return toBeDecorated(pathToFileURL(filePath).href);
+};
 
 export const diRegistrationWatcherInjectable = getInjectable({
   id: "di-registration-watcher",
