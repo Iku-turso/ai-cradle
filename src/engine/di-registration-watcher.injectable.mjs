@@ -3,6 +3,7 @@ import chokidar from "chokidar";
 import injectable from "@ogre-tools/injectable";
 import ogreToolsFp from "@ogre-tools/fp";
 import { createRequire } from "module";
+import { pathToFileURL } from "url";
 
 const require = createRequire(import.meta.url);
 const lodashFp = require("lodash/fp");
@@ -11,20 +12,23 @@ const { pipeline } = ogreToolsFp;
 const { values, filter, spread } = lodashFp;
 const { getInjectable, isInjectable } = injectable;
 
+const withFileUrl = (toBeDecorated) => (filePath) =>
+  toBeDecorated(pathToFileURL(filePath).href);
+
 export const diRegistrationWatcherInjectable = getInjectable({
   id: "di-registration-watcher",
 
   instantiate: (di) => {
     const injectablesByPath = new Map();
-    const register = registerFor(di, injectablesByPath);
-    const deregister = deregisterFor(di, injectablesByPath);
-    const reregister = reregisterFor(deregister, register);
+    const register = withFileUrl(registerFor(di, injectablesByPath));
+    const deregister = withFileUrl(deregisterFor(di, injectablesByPath));
+    const reregister = withFileUrl(reregisterFor(deregister, register));
 
     return {
       start: () => {
-        const directoryToWatch = path.resolve("src", "skills");
+        const modulePath = path.resolve("src", "skills");
 
-        const watcher = chokidar.watch(directoryToWatch, {
+        const watcher = chokidar.watch(modulePath, {
           persistent: true,
           depth: 99,
           ignoreInitial: false,
@@ -43,19 +47,19 @@ export const diRegistrationWatcherInjectable = getInjectable({
   },
 });
 
-const registerFor = (di, injectablesByPath) => async (filePath) => {
-  if (!filePath.endsWith(".injectable.mjs")) {
+const registerFor = (di, injectablesByPath) => async (fileUrl) => {
+  if (!fileUrl.endsWith(".injectable.mjs")) {
     return;
   }
 
   try {
     await pipeline(
-      await import(`${filePath}?${Math.random()}`),
+      await import(`${fileUrl}?${Math.random()}`),
       values,
       filter(isInjectable),
       (injectables) => {
         di.register(...injectables);
-        injectablesByPath.set(filePath, injectables);
+        injectablesByPath.set(fileUrl, injectables);
 
         // console.log(
         //   "Skills registered:",
@@ -68,12 +72,12 @@ const registerFor = (di, injectablesByPath) => async (filePath) => {
   }
 };
 
-const deregisterFor = (di, injectablesByPath) => (filePath) => {
-  if (!filePath.endsWith(".injectable.mjs")) {
+const deregisterFor = (di, injectablesByPath) => (fileUrl) => {
+  if (!fileUrl.endsWith(".injectable.mjs")) {
     return;
   }
 
-  pipeline(injectablesByPath.get(filePath), (injectables) => {
+  pipeline(injectablesByPath.get(fileUrl), (injectables) => {
     if (injectables) {
       di.deregister(...injectables);
     }
@@ -84,11 +88,11 @@ const deregisterFor = (di, injectablesByPath) => (filePath) => {
     // );
   });
 
-  injectablesByPath.delete(filePath);
+  injectablesByPath.delete(fileUrl);
 };
 
-const reregisterFor = (deregister, register) => async (filePath) => {
-  deregister(filePath);
+const reregisterFor = (deregister, register) => async (fileUrl) => {
+  deregister(fileUrl);
 
-  await register(filePath);
+  await register(fileUrl);
 };

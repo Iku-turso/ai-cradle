@@ -17,8 +17,8 @@ export const npmInstallMissingDependencies = getInjectable({
       name: "npm-install-missing-dependencies",
       parse: JSON.parse,
       function: async () => {
-        const skillsDirectory = path.resolve("src", "skills");
-        const packageJsonPath = path.resolve("package.json");
+        const skillsDirectory = path.join("src", "skills");
+        const packageJsonPath = path.join("package.json");
 
         const packageJson = JSON.parse(
           fs.readFileSync(packageJsonPath, "utf8"),
@@ -43,7 +43,10 @@ export const npmInstallMissingDependencies = getInjectable({
           while ((match = importRegex.exec(content)) !== null) {
             const moduleName = match[1];
             // Consider only non-relative imports and non-native modules as potential npm packages
-            if (!moduleName.startsWith(".") && !builtinModules.includes(moduleName)) {
+            if (
+              !moduleName.startsWith(".") &&
+              !builtinModules.includes(moduleName)
+            ) {
               importedModules.add(moduleName);
             }
           }
