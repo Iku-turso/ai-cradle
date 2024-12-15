@@ -32,7 +32,10 @@ export const diRegistrationWatcherInjectable = getInjectable({
     const reregister = withFileUrl(reregisterFor(deregister, register));
 
     return {
-      start: () => {
+      start: async () => {
+        const initialRegistrations = new Set();
+        let watcherHasStarted = false;
+
         const modulePath = path.resolve("src", "skills");
 
         const watcher = chokidar.watch(modulePath, {
@@ -41,14 +44,31 @@ export const diRegistrationWatcherInjectable = getInjectable({
           ignoreInitial: false,
         });
 
-        watcher
-          .on("unlink", deregister)
-          .on("add", register)
-          .on("change", reregister)
-          .on("rename", (path) => {
-            throw new Error("Renames of files are not supported yet");
-          })
-          .on("error", (error) => console.error(`Watcher error: ${error}`));
+        await new Promise((resolveStart) => {
+          watcher
+            .on("unlink", deregister)
+            .on("add", (path) => {
+              const registration = register(path);
+
+              if (!watcherHasStarted) {
+                initialRegistrations.add(registration);
+              }
+            })
+            .on("change", reregister)
+            .on("rename", (path) => {
+              throw new Error("Renames of files are not supported yet");
+            })
+            .on("error", (error) => console.error(`Watcher error: ${error}`))
+            .on("ready", async () => {
+              await Promise.all(initialRegistrations);
+
+              initialRegistrations.clear();
+
+              watcherHasStarted = true;
+
+              resolveStart();
+            });
+        });
       },
     };
   },
@@ -75,7 +95,7 @@ const registerFor = (di, injectablesByPath) => async (fileUrl) => {
       },
     );
   } catch (e) {
-    console.error("error while registering", e);
+    console.error(`Error while registering "${fileUrl}"`, e);
   }
 };
 

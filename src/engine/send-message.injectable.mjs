@@ -8,18 +8,14 @@ export const sendMessageInjectable = getInjectable({
   id: "send-message",
 
   instantiate: (di) => {
-    const directives = di
-      .injectMany(aiDirectiveInjectionToken)
-      .map(toUserMessage);
-
-    const messages = [...directives];
+    const userMessages = [];
 
     const openai = new OpenAI({
       apiKey: process.env.OPEN_AI_API_KEY,
     });
 
     return async (message) => {
-      messages.push(toUserMessage(message));
+      userMessages.push(toUserMessage(message));
 
       const skills = di.injectMany(skillInjectionToken);
 
@@ -28,6 +24,7 @@ export const sendMessageInjectable = getInjectable({
 
         function: {
           ...skill.function,
+
           function: withTryForResult(
             skill.function.function,
             skill.function.name,
@@ -35,12 +32,25 @@ export const sendMessageInjectable = getInjectable({
         },
       }));
 
+      const directivesString = di
+        .injectMany(aiDirectiveInjectionToken)
+        .map((directive, i) => `Directive #${i}: ${directive}`)
+        .join("\n\n");
+
+      const directivesMessage = toUserMessage(
+        "You are an AI-assistant with following directives: \n\n" +
+          directivesString,
+      );
+
       const runner = openai.beta.chat.completions
         .runTools({
           // stream: true,
           model: "gpt-4o",
-          messages,
-          ...(skills.length > 0 ? { tools: skillsWithErrorHandling } : {}),
+          messages: [directivesMessage, ...userMessages],
+
+          ...(skillsWithErrorHandling.length > 0
+            ? { tools: skillsWithErrorHandling }
+            : {}),
         })
         //   .on("content", (delta, snapshot) => {
         //     console.log(snapshot);
@@ -54,7 +64,7 @@ export const sendMessageInjectable = getInjectable({
             delete message.tool_calls;
           }
 
-          messages.push(message);
+          userMessages.push(message);
         });
 
       return await runner.finalContent();

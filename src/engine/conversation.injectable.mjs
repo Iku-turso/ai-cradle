@@ -3,6 +3,7 @@ import { promptInputFromUserInjectable } from "./prompt-input-from-user.injectab
 import { sendMessageInjectable } from "./send-message.injectable.mjs";
 
 import injectable from "@ogre-tools/injectable";
+import { aiDirectiveInjectionToken } from "./ai-directive-injection-token.mjs";
 const { getInjectable } = injectable;
 
 export const conversationInjectable = getInjectable({
@@ -17,10 +18,11 @@ export const conversationInjectable = getInjectable({
       start: async () => {
         while (true) {
           const userInput = await promptInputFromUser();
+          terminalInterface.write("\n");
 
           const response = await sendMessage(userInput);
 
-          terminalInterface.write(`AI: ${response}\n`);
+          terminalInterface.write(`AI: ${response}\n\n`);
         }
       },
     };

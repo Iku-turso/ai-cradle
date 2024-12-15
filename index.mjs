@@ -21,7 +21,7 @@ di.register(
   sendMessageInjectable,
 );
 
-const { start: startAutoRegistration, close } = di.inject(
+const { start: startAutoRegistration } = di.inject(
   diRegistrationWatcherInjectable,
 );
 
@@ -30,5 +30,5 @@ const { start: startConversation } = di.inject(
   "main-conversation",
 );
 
-startAutoRegistration();
+await startAutoRegistration();
 await startConversation();
