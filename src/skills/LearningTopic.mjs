@@ -7,11 +7,12 @@ export class LearningTopic {
     constructor({ defaultPassingScore = 70, learningPath = [] } = {}) {
         this.topics = {};
         this.scores = {};
-        this.globalPassingScore = defaultPassingScore; // Use parameter for global passing score
-        this.learningPath = learningPath; // Set learning path from parameter
+        this.globalPassingScore = defaultPassingScore;
+        this.learningPath = learningPath;
     }
 
     addTopic(topic) {
+        console.log(`LearningTopic: Adding topic ${topic}`);
         if (this.topics[topic]) {
             throw new Error(`Error: Topic ${topic} already exists.`);
         }
@@ -20,6 +21,7 @@ export class LearningTopic {
     }
 
     recordQuizScore(topic, score) {
+        console.log(`LearningTopic: Recording quiz score for topic ${topic}`);
         if (this.topics[topic] === undefined) {
             throw new Error(`Error: Topic ${topic} not found.`);
         }
@@ -31,10 +33,12 @@ export class LearningTopic {
     }
 
     setLearningPath(path) {
+        console.log(`LearningTopic: Setting learning path`);
         this.learningPath = path;
     }
 
     getNextTopic() {
+        console.log(`LearningTopic: Getting next topic`);
         const completedTopics = Object.keys(this.topics).filter(t => this.topics[t].completed);
         const nextTopic = this.learningPath[completedTopics.length];
         return nextTopic ? `Next topic to learn: ${nextTopic}` : `All topics completed!`;
