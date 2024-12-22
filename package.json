@@ -4,7 +4,7 @@
   "main": "index.mjs",
   "scripts": {
     "setup": "npm install",
-    "start": "nodemon --exec \"clear && node\" index.mjs"
+    "start": "nodemon --exec \"cls && node\" index.mjs"
   },
   "author": "",
   "license": "ISC",
