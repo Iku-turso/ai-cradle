@@ -43,4 +43,5 @@ export class LearningTopic {
         const nextTopic = this.learningPath[completedTopics.length];
         return nextTopic ? `Next topic to learn: ${nextTopic}` : `All topics completed!`;
     }
+
 }
